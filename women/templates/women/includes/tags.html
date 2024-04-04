@@ -1,0 +1,7 @@
+<nav>
+         <a href="{% url 'women_start_page' %}">Все теги</a> |
+
+    {% for tag in tags %}
+         <a href="{{ tag.get_absolute_url }}">{{ tag.tag }}</a> {% if forloop.last %}{% else %}|{% endif %}
+    {% endfor %}
+</nav>

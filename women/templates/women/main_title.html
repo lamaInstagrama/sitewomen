@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load women_tags %}
+
+{% block title %}
+    <h1>{{ title }}</h1>
+{% endblock title %}
+
+
+
+{% block content %}
+
+    {{ block.super }}
+
+    {% include 'women/includes/nav.html' %}
+    {% include 'women/includes/tags.html' %}
+
+    {% for woman in data_db %}
+
+            <h2>{{ woman.title }}</h2>
+            <p>{{ woman.content | linebreaks | truncatewords:"25"}}</p>
+                {% if woman.photo != 'NoPhoto' %}
+                    <p><img src="{% static 'women/images/'|add:woman.photo %}" width="150" height="100"></p>
+                {% else %}
+                    <p>Пока для нее нет фото :(</p>
+                {% endif %}
+            <p><a href="{{ woman.get_absolute_url }}">Читать пост</a></p>
+            {% if not forloop.last %}
+            <hr>
+
+        {% endif %}
+    {% endfor %}
+
+    {% include 'women/includes/nav.html' %}
+
+{% endblock content %}

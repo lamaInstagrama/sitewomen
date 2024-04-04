@@ -1,0 +1,7 @@
+<nav>
+         <a href="{% url 'women_start_page' %}">Все женщины</a> |
+    {% for cat in categories %}
+         <a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a> {% if forloop.last %}{% else %}|{% endif %}
+    {% endfor %}
+
+</nav>

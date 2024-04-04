@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<h1>Биография {{ woman.title }}</h1>
+{% endblock title %}
+
+{% block content %}
+{{ block.super }}
+{% include 'women/includes/tags.html' %}
+{% if woman.photo != 'NoPhoto' %}
+    <p><img src="{% static 'women/images/'|add:woman.photo %}"></p>
+{% endif %}
+{{ woman.content | linebreaks }}
+{% endblock content %}
