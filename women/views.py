@@ -104,7 +104,7 @@ def add_page(request: HttpRequest):
         if form.is_valid():
             try:
                 tags = form.cleaned_data.pop('tags')
-                w = Women.objects.create(**form.cleaned_data)
+                w = Women.objects.create(**form.cleaned_data)  # all fields exclude ManyToMany
                 w.tags.set(tags)
                 return redirect('women_start_page')
             except:
