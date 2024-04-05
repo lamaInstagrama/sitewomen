@@ -106,8 +106,6 @@ def add_page(request: HttpRequest):
                 tags = form.cleaned_data.pop('tags')
                 w = Women.objects.create(**form.cleaned_data)
                 w.tags.set(tags)
-                # print(form.cleaned_data)
-                # Women.objects.create(**form.cleaned_data)
                 return redirect('women_start_page')
             except:
                 form.add_error(None, 'Ошибка добавления поста')
