@@ -29,7 +29,7 @@ class WomenAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     # readonly_fields = ['slug']
     # exclude = ['tags', 'is_published']
-    list_display = ['pk', 'title', 'time_update', 'is_published', 'cat', 'count_len']
+    list_display = ['pk', 'title', 'slug', 'time_update', 'is_published', 'cat', 'count_len']
     list_display_links = ['pk', 'title']
     ordering = ['time_update', 'title']
     list_editable = ['is_published']
