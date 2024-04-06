@@ -24,6 +24,10 @@ class AddPostForm(forms.ModelForm):
         return title
 
 
+class UploadFileFrom(forms.Form):
+    file = forms.ImageField(label='')
+
+
 # Форма, не связанная с моделями
 # class AddPostForm(forms.Form):
 #     title = forms.CharField(max_length=255,
