@@ -1,7 +1,21 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import reverse
 from django.template.defaultfilters import slugify
+
+
+class TagsValidator:
+    code = 'tags'
+
+    def __init__(self, message: str | None = None):
+        self.message = message or 'Нельзя выбирать \'Блондинки\' и \'Брюнетки\' одновременно'
+
+    def __call__(self, value, *args, **kwargs):
+        objs = TagPost.objects.filter(tag__in=('Блондинки', 'Брюнетки')).values('pk')
+        pks = set(str(tuple(obj.values())[0]) for obj in objs)
+        if pks <= set(value):
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
 class PublishedModel(models.Manager):
@@ -16,6 +30,7 @@ class Women(models.Model):
 
     objects = models.Manager()
     published = PublishedModel()
+
     title = models.CharField(max_length=255, verbose_name='Имя женщины')
     content = models.TextField(blank=True, verbose_name='Биография')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
@@ -25,7 +40,8 @@ class Women(models.Model):
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
     photo = models.CharField(max_length=255, default='NoPhoto')
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name='Категории')
-    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Тэги')
+    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Тэги',
+                                  validators=(TagsValidator(),))
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, null=True, blank=True, related_name='married',
                                    verbose_name='Муж')
 
@@ -39,7 +55,7 @@ class Women(models.Model):
     class Meta:
         verbose_name = 'Все мои женщины'
         verbose_name_plural = 'Все мои женщины'
-        ordering = ['title']
+        ordering = ['-time_create']
 
     def __str__(self):
         return self.title

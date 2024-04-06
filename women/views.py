@@ -102,13 +102,8 @@ def add_page(request: HttpRequest):
     if request.POST:
         form = AddPostForm(request.POST)
         if form.is_valid():
-            try:
-                tags = form.cleaned_data.pop('tags')
-                w = Women.objects.create(**form.cleaned_data)  # all fields exclude ManyToMany
-                w.tags.set(tags)
-                return redirect('women_start_page')
-            except:
-                form.add_error(None, 'Ошибка добавления поста')
+            form.save()
+            return redirect('women_start_page')
     else:
         form = AddPostForm()
     return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
