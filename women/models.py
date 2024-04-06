@@ -29,9 +29,9 @@ class Women(models.Model):
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, null=True, blank=True, related_name='married',
                                    verbose_name='Муж')
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     self.slug = slugify(self.title)
+    #     super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('post', args=(self.slug,))
