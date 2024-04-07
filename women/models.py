@@ -2,20 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import reverse
-from django.template.defaultfilters import slugify
-
-
-class TagsValidator:
-    code = 'tags'
-
-    def __init__(self, message: str | None = None):
-        self.message = message or 'Нельзя выбирать \'Блондинки\' и \'Брюнетки\' одновременно'
-
-    def __call__(self, value, *args, **kwargs):
-        objs = TagPost.objects.filter(tag__in=('Блондинки', 'Брюнетки')).values('pk')
-        pks = set(str(tuple(obj.values())[0]) for obj in objs)
-        if pks <= set(value):
-            raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
 class PublishedModel(models.Manager):
@@ -33,15 +19,15 @@ class Women(models.Model):
 
     title = models.CharField(max_length=255, verbose_name='Имя женщины')
     content = models.TextField(blank=True, verbose_name='Биография')
+    photo = models.ImageField(upload_to='photos/%Y/%m/%d', default=None, blank=True, null=True, verbose_name='Фото')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices))
                                        , default=Status.DRAFT, verbose_name='Статус')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
-    photo = models.CharField(max_length=255, default='NoPhoto')
+    photo_new = models.CharField(max_length=255, default='NoPhoto')
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name='Категории')
-    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Тэги',
-                                  validators=(TagsValidator(),))
+    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Тэги')
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, null=True, blank=True, related_name='married',
                                    verbose_name='Муж')
 
@@ -94,3 +80,7 @@ class TagPost(models.Model):
 
     def get_absolute_url(self):
         return reverse('tag', args=(self.slug,))
+
+
+class UploadFiles(models.Model):
+    file = models.FileField(upload_to='sitewomen/uploads_model')

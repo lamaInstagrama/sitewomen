@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
-from women.models import Women, Category, TagPost
+from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
 import uuid
 
@@ -95,22 +95,22 @@ def info_women_redirect(request: HttpRequest):
     return HttpResponse('Какая то ошибка :(')
 
 
-def handle_uploaded_file(f):
-    name = f.name
-    ext = ''
-    if '.' in name:
-        name, ext = name.rsplit('.', 1)
-    with open(f"sitewomen/uploads/{name}_{str(uuid.uuid4())}.{ext}", "wb+") as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
+# def handle_uploaded_file(f):
+#     name = f.name
+#     ext = ''
+#     if '.' in name:
+#         name, ext = name.rsplit('.', 1)
+#     with open(f"sitewomen/uploads/{name}_{str(uuid.uuid4())}.{ext}", "wb+") as destination:
+#         for chunk in f.chunks():
+#             destination.write(chunk)
 
 
 def about(request: HttpRequest):
     if request.POST:
         form = UploadFileFrom(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(form.cleaned_data['file'])  # handle_uploaded_file(form.cleaned_data['file'])
-
+            # handle_uploaded_file(form.cleaned_data['file'])  # handle_uploaded_file(form.cleaned_data['file'])
+            UploadFiles.objects.create(file=form.cleaned_data.get('file'))
     else:
         form = UploadFileFrom()
     return render(request, 'women/about.html', context={'menu': menu, 'title': 'О сайте', 'form': form})
@@ -118,7 +118,7 @@ def about(request: HttpRequest):
 
 def add_page(request: HttpRequest):
     if request.POST:
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('women_start_page')
