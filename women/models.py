@@ -25,7 +25,6 @@ class Women(models.Model):
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices))
                                        , default=Status.DRAFT, verbose_name='Статус')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
-    photo_new = models.CharField(max_length=255, default='NoPhoto')
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name='Категории')
     tags = models.ManyToManyField('TagPost', blank=True, related_name='tags', verbose_name='Тэги')
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL, null=True, blank=True, related_name='married',

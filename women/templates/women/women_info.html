@@ -8,8 +8,8 @@
 {% block content %}
 {{ block.super }}
 {% include 'women/includes/tags.html' %}
-{% if woman.photo != 'NoPhoto' %}
-    <p><img src="{% static 'women/images/'|add:woman.photo %}"></p>
+{% if woman.photo %}
+    <p><img src="{{ woman.photo.url }}"></p>
 {% endif %}
 {{ woman.content | linebreaks }}
 {% endblock content %}
