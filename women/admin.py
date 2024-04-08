@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.db.models import F
 from django.db.models.functions import Length
+from django.utils.safestring import mark_safe
 
 from women.models import Women, Category
 
@@ -24,12 +25,13 @@ class MarriedFilter(admin.SimpleListFilter):
 
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
-    fields = ['title', 'slug', 'content', 'cat', 'tags']
+    fields = ['title', 'slug', 'photo', 'post_photo', 'content', 'cat', 'tags']
+    readonly_fields = ['post_photo']
     filter_horizontal = ['tags']
     prepopulated_fields = {'slug': ('title',)}
     # readonly_fields = ['slug']
     # exclude = ['tags', 'is_published']
-    list_display = ['pk', 'title', 'slug', 'time_update', 'is_published', 'cat', 'count_len']
+    list_display = ['pk', 'title', 'slug', 'post_photo', 'time_update', 'is_published', 'cat', 'count_len']
     list_display_links = ['pk', 'title']
     ordering = ['time_update', 'title']
     list_editable = ['is_published']
@@ -37,6 +39,14 @@ class WomenAdmin(admin.ModelAdmin):
     actions = ['set_published', 'set_unpublished']
     search_fields = ['title', 'cat__name']
     list_filter = [MarriedFilter, 'cat__name', 'is_published']
+    save_on_top = True
+
+    @staticmethod
+    @admin.display(description='Фото')
+    def post_photo(women: Women):
+        if women.photo:
+            return mark_safe(f"<img src='{women.photo.url}' width=50>")
+        return 'No Photo'
 
     @staticmethod
     @admin.display(description='Количество символов', ordering=Length(F('content')))
