@@ -2,10 +2,10 @@ from django.urls import path, re_path
 from women import views
 
 urlpatterns = [
-    path('', views.main_page, name='women_start_page'),
+    path('', views.WomenHome.as_view(), name='women_start_page'),
     re_path(r'button(?P<num>\d*)/', views.button),
     path('about/', views.about, name='about'),
-    path('add_page/', views.add_page, name='add_page'),
+    path('add_page/', views.AddPage.as_view(), name='add_page'),
     path('contact/', views.contact, name='contact'),
     path('login/', views.login, name='login'),
     path(r'<slug:slug_name>/', views.info_women, name='post'),

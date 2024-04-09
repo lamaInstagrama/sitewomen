@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
+from django.views import View
+from django.views.generic import TemplateView
+
 from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
 import uuid
@@ -36,6 +39,17 @@ def main_page(request: HttpRequest):
 
     }
     return render(request, 'women/main_title.html', context=data)
+
+
+class WomenHome(TemplateView):
+    template_name = 'women/main_title.html'
+    extra_context = {
+        'title': 'Главная страница',
+        'menu': menu,
+        'data_db': Women.published.all(),
+        'categories': Category.objects.all(),
+        'tags': TagPost.objects.all(),
+    }
 
 
 def button(request: HttpRequest, num):
@@ -95,16 +109,6 @@ def info_women_redirect(request: HttpRequest):
     return HttpResponse('Какая то ошибка :(')
 
 
-# def handle_uploaded_file(f):
-#     name = f.name
-#     ext = ''
-#     if '.' in name:
-#         name, ext = name.rsplit('.', 1)
-#     with open(f"sitewomen/uploads/{name}_{str(uuid.uuid4())}.{ext}", "wb+") as destination:
-#         for chunk in f.chunks():
-#             destination.write(chunk)
-
-
 def about(request: HttpRequest):
     if request.POST:
         form = UploadFileFrom(request.POST, request.FILES)
@@ -126,6 +130,19 @@ def add_page(request: HttpRequest):
         form = AddPostForm()
     return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
 
+
+class AddPage(View):
+    def get(self, request):
+        form = AddPostForm()
+        return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
+
+    def post(self, request):
+        form = AddPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('women_start_page')
+
+        return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
 
 def contact(request: HttpRequest):
     return render(request, 'women/contact.html', context={'data': DataTemplate('Ilya', 'Buyanov') })
