@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from django.views import View
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
@@ -59,23 +59,6 @@ class Button(TemplateView):
     template_name = 'women/button.html'
 
 
-def show_category(request: HttpRequest, cat_slug: str):
-    category = get_object_or_404(Category, slug=cat_slug)
-    posts = Women.published.filter(cat_id=category.pk)
-    categories = Category.objects.all()
-    tags = TagPost.objects.all()
-
-    data = {
-        'title': f'Рубрика: {category.name}',
-        'menu': menu,
-        'data_db': posts,
-        'categories': categories,
-        'tags': tags,
-    }
-
-    return render(request, 'women/main_title.html', context=data)
-
-
 class WomenCategory(ListView):
     template_name = 'women/main_title.html'
     context_object_name = 'data_db'
@@ -117,17 +100,20 @@ class TagPostList(ListView):
         return context
 
 
-def info_women(request: HttpRequest, slug_name):
-    if not slug_name:
-        return redirect('women_post_redirect')
-    woman = get_object_or_404(Women, slug=slug_name)
-    tags = woman.tags.all()
-    context = {
-        'woman': woman,
-        'tags': tags,
-    }
+class ShowPost(DetailView):
+    model = Women
+    template_name = 'women/women_info.html'
+    slug_url_kwarg = 'slug_name'
+    # pk_url_kwarg = ''  # Для первичных ключей
+    context_object_name = 'woman'
 
-    return render(request, 'women/women_info.html', context=context)
+    def get_object(self, queryset=None):
+        return get_object_or_404(Women.published, slug=self.kwargs.get(self.slug_url_kwarg))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] = context.get(self.context_object_name).tags.all()
+        return context
 
 
 def info_women_redirect(request: HttpRequest):
