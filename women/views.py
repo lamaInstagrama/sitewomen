@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 
 from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
@@ -18,44 +18,45 @@ menu = [
 class DataTemplate:
     def __init__(self, first_name, last_name):
         self.first_name = first_name
-        self.last_name= last_name
+        self.last_name = last_name
 
     def get_info(self):
         return self.first_name + " " + self.last_name
 
 
 # Create your views here.
-def main_page(request: HttpRequest):
-    data_db = Women.published.all()
-    categories = Category.objects.all()
-    tags = TagPost.objects.all()
+# def main_page(request: HttpRequest):
+#     data_db = Women.published.all()
+#     categories = Category.objects.all()
+#     tags = TagPost.objects.all()
+#
+#     data = {
+#         'title': 'Главная страница',
+#         'menu': menu,
+#         'data_db': data_db,
+#         'categories': categories,
+#         'tags': tags,
+#
+#     }
+#     return render(request, 'women/main_title.html', context=data)
 
-    data = {
-        'title': 'Главная страница',
-        'menu': menu,
-        'data_db': data_db,
-        'categories': categories,
-        'tags': tags,
 
-    }
-    return render(request, 'women/main_title.html', context=data)
-
-
-class WomenHome(TemplateView):
+class WomenHome(ListView):
     template_name = 'women/main_title.html'
+    context_object_name = 'data_db'
     extra_context = {
         'title': 'Главная страница',
         'menu': menu,
-        'data_db': Women.published.all(),
         'categories': Category.objects.all(),
         'tags': TagPost.objects.all(),
     }
 
+    def get_queryset(self):
+        return Women.published.all()
 
-def button(request: HttpRequest, num):
-    if num:
-        return HttpResponse(f'<button type="button">Я кнопка №{num}</button>')
-    return HttpResponse(f'<button type="button">Я кнопка без номера :(</button>')
+
+class Button(TemplateView):
+    template_name = 'women/button.html'
 
 
 def show_category(request: HttpRequest, cat_slug: str):
@@ -75,21 +76,45 @@ def show_category(request: HttpRequest, cat_slug: str):
     return render(request, 'women/main_title.html', context=data)
 
 
-def show_tag_postlist(request, tag_slug):
-    tag = get_object_or_404(TagPost, slug=tag_slug)
-    posts = tag.tags.all().filter(is_published=Women.Status.PUBLISHED)
-    categories = Category.objects.all()
-    tags = TagPost.objects.all()
+class WomenCategory(ListView):
+    template_name = 'women/main_title.html'
+    context_object_name = 'data_db'
 
-    data = {
-        'title': f'Тег: {tag.tag}',
+    extra_context = {
         'menu': menu,
-        'data_db': posts,
-        'categories': categories,
-        'tags': tags,
+        'categories': Category.objects.all(),
+        'tags': TagPost.objects.all(),
     }
 
-    return render(request, 'women/main_title.html', context=data)
+    def get_queryset(self):
+        return Women.published.filter(cat__slug=self.kwargs['cat_slug'])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        category = get_object_or_404(Category, slug=self.kwargs.get('cat_slug'))
+        context['category'] = category
+        context['title'] = f'Рубрика: {category.name}'
+        return context
+
+
+class TagPostList(ListView):
+    template_name = 'women/main_title.html'
+    context_object_name = 'data_db'
+    extra_context = {
+        'menu': menu,
+        'categories': Category.objects.all(),
+        'tags': TagPost.objects.all(),
+    }
+
+    def get_queryset(self):
+        return Women.published.filter(tags__slug=self.kwargs.get('tag_slug'))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = get_object_or_404(TagPost, slug=self.kwargs.get('tag_slug'))
+        context['title'] = f'Тег: {tag.tag}'
+        return context
 
 
 def info_women(request: HttpRequest, slug_name):
