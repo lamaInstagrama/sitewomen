@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 
 from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
@@ -131,29 +132,44 @@ def about(request: HttpRequest):
     return render(request, 'women/about.html', context={'menu': menu, 'title': 'О сайте', 'form': form})
 
 
-def add_page(request: HttpRequest):
-    if request.POST:
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('women_start_page')
-    else:
-        form = AddPostForm()
-    return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
+class AddPage(CreateView):
+    form_class = AddPostForm
+    # model = Women
+    # fields = '__all__'
+    template_name = 'women/add_page.html'
+    success_url = reverse_lazy('women_start_page')
+
+    extra_context = {
+        'menu': menu,
+        'title': 'Добавить статью'
+    }
 
 
-class AddPage(View):
-    def get(self, request):
-        form = AddPostForm()
-        return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
+class UpdatePage(UpdateView):
+    form_class = AddPostForm
+    model = Women
+    # fields = ['title', 'content', 'photo', 'is_published', 'cat']
+    template_name = 'women/add_page.html'
+    success_url = reverse_lazy('women_start_page')
+    extra_context = {
+        'menu': menu,
+        'title': 'Добавить статью'
+    }
+    slug_url_kwarg = 'slug_name'
 
-    def post(self, request):
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('women_start_page')
 
-        return render(request, 'women/add_page.html', context={'menu': menu, 'title': 'Добавить статью', 'form': form})
+class DeletePost(DeleteView):
+    # form_class = AddPostForm
+    model = Women
+    template_name = 'women/add_page.html'
+    success_url = reverse_lazy('women_start_page')
+    extra_context = {
+        'menu': menu,
+        'title': 'Добавить статью'
+    }
+    slug_url_kwarg = 'slug_name'
+
+
 
 def contact(request: HttpRequest):
     return render(request, 'women/contact.html', context={'data': DataTemplate('Ilya', 'Buyanov') })

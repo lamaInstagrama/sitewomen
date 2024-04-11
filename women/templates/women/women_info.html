@@ -12,4 +12,7 @@
     <p><img src="{{ woman.photo.url }}"></p>
 {% endif %}
 {{ woman.content | linebreaks }}
+<p><a href="{% url 'edit_page' woman.slug %}">Редактировать статью</a></p>
+<p><a href="{% url 'delete_page' woman.slug %}">Удалить статью</a></p>
+
 {% endblock content %}

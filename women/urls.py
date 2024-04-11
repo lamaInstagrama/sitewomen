@@ -6,6 +6,8 @@ urlpatterns = [
     re_path(r'button(?P<num>\d*)/', views.Button.as_view()),
     path('about/', views.about, name='about'),
     path('add_page/', views.AddPage.as_view(), name='add_page'),
+    path('edit/<slug:slug_name>/', views.UpdatePage.as_view(), name='edit_page'),
+    path('delete/<slug:slug_name>/', views.DeletePost.as_view(), name='delete_page'),
     path('contact/', views.contact, name='contact'),
     path('login/', views.login, name='login'),
     path(r'<slug:slug_name>/', views.ShowPost.as_view(), name='post'),
