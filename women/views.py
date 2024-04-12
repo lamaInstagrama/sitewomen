@@ -160,7 +160,7 @@ class UpdatePage(UpdateView):
 
 class DeletePost(DeleteView):
     # form_class = AddPostForm
-    model = Women
+    model = Women  # Change 3
     template_name = 'women/add_page.html'
     success_url = reverse_lazy('women_start_page')
     extra_context = {
