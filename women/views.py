@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from django.urls import reverse, reverse_lazy
@@ -60,7 +61,7 @@ class TagPostList(DataMixin, ListView):
         return context
 
 
-class ShowPost(DetailView):
+class ShowPost(DataMixin, DetailView):
     model = Women
     template_name = 'women/women_info.html'
     slug_url_kwarg = 'slug_name'
@@ -80,14 +81,14 @@ def info_women_redirect(request: HttpRequest):
 
 
 def about(request: HttpRequest):
-    if request.POST:
-        form = UploadFileFrom(request.POST, request.FILES)
-        if form.is_valid():
-            # handle_uploaded_file(form.cleaned_data['file'])  # handle_uploaded_file(form.cleaned_data['file'])
-            UploadFiles.objects.create(file=form.cleaned_data.get('file'))
-    else:
-        form = UploadFileFrom()
-    return render(request, 'women/about.html', context={'title': 'О сайте', 'form': form})
+    contact_list = Women.published.all()
+    paginator = Paginator(contact_list, 4)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    return render(request, 'women/about.html',
+                  context={'title': 'О сайте', 'page': page_object}
+                  )
 
 
 class AddPage(DataMixin, CreateView):
