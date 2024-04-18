@@ -1,19 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from django.urls import reverse, reverse_lazy
-from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 
 from women.models import Women, Category, TagPost, UploadFiles
 from women.forms import AddPostForm, UploadFileFrom
-import uuid
-
-menu = [
-    {'title': "О сайте", 'url_name': 'about'},
-    {'title': "Добавить статью", 'url_name': 'add_page'},
-    {'title': "Обратная связь", 'url_name': 'contact'},
-    {'title': "Войти", 'url_name': 'login'}
-        ]
+from women.utils import DataMixin
 
 
 class DataTemplate:
@@ -25,32 +17,10 @@ class DataTemplate:
         return self.first_name + " " + self.last_name
 
 
-# Create your views here.
-# def main_page(request: HttpRequest):
-#     data_db = Women.published.all()
-#     categories = Category.objects.all()
-#     tags = TagPost.objects.all()
-#
-#     data = {
-#         'title': 'Главная страница',
-#         'menu': menu,
-#         'data_db': data_db,
-#         'categories': categories,
-#         'tags': tags,
-#
-#     }
-#     return render(request, 'women/main_title.html', context=data)
-
-
-class WomenHome(ListView):
+class WomenHome(DataMixin, ListView):
     template_name = 'women/main_title.html'
     context_object_name = 'data_db'
-    extra_context = {
-        'title': 'Главная страница',
-        'menu': menu,
-        'categories': Category.objects.all(),
-        'tags': TagPost.objects.all(),
-    }
+    title_page = 'Главная страница'
 
     def get_queryset(self):
         return Women.published.all()
@@ -60,15 +30,9 @@ class Button(TemplateView):
     template_name = 'women/button.html'
 
 
-class WomenCategory(ListView):
+class WomenCategory(DataMixin, ListView):
     template_name = 'women/main_title.html'
     context_object_name = 'data_db'
-
-    extra_context = {
-        'menu': menu,
-        'categories': Category.objects.all(),
-        'tags': TagPost.objects.all(),
-    }
 
     def get_queryset(self):
         return Women.published.filter(cat__slug=self.kwargs['cat_slug'])
@@ -82,14 +46,9 @@ class WomenCategory(ListView):
         return context
 
 
-class TagPostList(ListView):
+class TagPostList(DataMixin, ListView):
     template_name = 'women/main_title.html'
     context_object_name = 'data_db'
-    extra_context = {
-        'menu': menu,
-        'categories': Category.objects.all(),
-        'tags': TagPost.objects.all(),
-    }
 
     def get_queryset(self):
         return Women.published.filter(tags__slug=self.kwargs.get('tag_slug'))
@@ -105,7 +64,6 @@ class ShowPost(DetailView):
     model = Women
     template_name = 'women/women_info.html'
     slug_url_kwarg = 'slug_name'
-    # pk_url_kwarg = ''  # Для первичных ключей
     context_object_name = 'woman'
 
     def get_object(self, queryset=None):
@@ -129,46 +87,31 @@ def about(request: HttpRequest):
             UploadFiles.objects.create(file=form.cleaned_data.get('file'))
     else:
         form = UploadFileFrom()
-    return render(request, 'women/about.html', context={'menu': menu, 'title': 'О сайте', 'form': form})
+    return render(request, 'women/about.html', context={'title': 'О сайте', 'form': form})
 
 
-class AddPage(CreateView):
+class AddPage(DataMixin, CreateView):
     form_class = AddPostForm
-    # model = Women
-    # fields = '__all__'
     template_name = 'women/add_page.html'
     success_url = reverse_lazy('women_start_page')
-
-    extra_context = {
-        'menu': menu,
-        'title': 'Добавить статью'
-    }
+    title = 'Добавить статью'
 
 
-class UpdatePage(UpdateView):
+class UpdatePage(DataMixin, UpdateView):
     form_class = AddPostForm
     model = Women
-    # fields = ['title', 'content', 'photo', 'is_published', 'cat']
     template_name = 'women/add_page.html'
     success_url = reverse_lazy('women_start_page')
-    extra_context = {
-        'menu': menu,
-        'title': 'Добавить статью'
-    }
+    title = 'Редактировать статью'
     slug_url_kwarg = 'slug_name'
 
 
-class DeletePost(DeleteView):
-    # form_class = AddPostForm
-    model = Women  # Change 3
+class DeletePost(DataMixin, DeleteView):
+    model = Women
     template_name = 'women/add_page.html'
     success_url = reverse_lazy('women_start_page')
-    extra_context = {
-        'menu': menu,
-        'title': 'Добавить статью'
-    }
+    title = 'Удалить статью'
     slug_url_kwarg = 'slug_name'
-
 
 
 def contact(request: HttpRequest):
