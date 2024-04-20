@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 
 from users.forms import LoginUserForm
+from women.utils import menu
 
 
 def login_user(request: HttpRequest):
