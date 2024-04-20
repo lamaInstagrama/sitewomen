@@ -1,19 +1,18 @@
-import women.views as views
 from django import template
+from django.db.models import Count
 
+import women.views as views
+from women.models import Category, TagPost
 
 register = template.Library()
-"""
-Создаю экземпляр этого класса, через него происходит регистрация собственных шаблонных тэгов
-"""
 
 
-@register.simple_tag(name='get_menu')
-def get_categories():
-    return views.menu
+@register.inclusion_tag('women/list_categories.html')
+def show_categories(cat_selected=0):
+    cats = Category.objects.annotate(total=Count("posts")).filter(total__gt=0)
+    return {'cats': cats, 'cat_selected': cat_selected}
 
 
-@register.inclusion_tag('women/show_menu.html')
-def show_menu():
-    menu = views.menu
-    return {'menu': menu}
+@register.inclusion_tag('women/list_tags.html')
+def show_all_tags():
+    return {'tags': TagPost.objects.annotate(total=Count("tags")).filter(total__gt=0)}

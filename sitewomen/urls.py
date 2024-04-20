@@ -17,17 +17,22 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from sitewomen import views, settings
+
+from sitewomen import settings
+from women import views
+from women.views import page_not_found
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('women/', include('women.urls')),
-    path('', views.start_page, name='start_page'),
+    path('', include('women.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-admin.site.site_header = 'Это мой сайт про женщин!!!'
-admin.site.index_title = 'Здесь все мои женщины!!!'
+
+handler404 = page_not_found
+
+admin.site.site_header = "Панель администрирования"
+admin.site.index_title = "Известные женщины мира"
