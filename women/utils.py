@@ -13,6 +13,7 @@ class DataMixin:
     title_page = None
     categories = None
     tags = None
+    paginate_by = 3
 
     def __init__(self):
         if 'menu' not in self.extra_context:

@@ -33,3 +33,21 @@
     {% include 'women/includes/nav.html' %}
 
 {% endblock content %}
+
+{% block navigation %}
+    {% if page_obj.has_other_pages %}
+        <nav class="list-pages">
+            <ul>
+                {% for p in paginator.page_range %}
+                <li class="page-num">
+                    {% if p != page_obj.number %}
+                        <a href="?page={{ p }}">{{ p }}</a>
+                    {% else %}
+                        {{ p }}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
+{% endblock %}
