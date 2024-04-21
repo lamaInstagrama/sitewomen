@@ -1,31 +1,11 @@
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
-
+from django.contrib.auth.views import LoginView
 from users.forms import LoginUserForm
-from women.utils import menu
 
 
-def login_user(request: HttpRequest):
-    match request.method:
-        case 'POST':
-            form = LoginUserForm(request.POST)
-            if form.is_valid():
-                user = authenticate(request,
-                                    username=form.cleaned_data['username'],
-                                    password=form.cleaned_data['password']
-                                    )
-                if user and user.is_active:
-                    a = login(request, user)
-                    return HttpResponseRedirect(reverse('home'))
+class LoginUser(LoginView):
+    template_name = 'users/login.html'
+    form_class = LoginUserForm
+    extra_context = {'title': "Авторизация"}
 
-        case _:
-            form = LoginUserForm()
-
-    return render(request, 'users/login.html', {'form': form})
-
-
-def logout_user(request: HttpRequest):
-    logout(request)
-    return HttpResponseRedirect(reverse_lazy('users:login'))
+    # def get_success_url(self):
+    #     return reverse_lazy('about')
