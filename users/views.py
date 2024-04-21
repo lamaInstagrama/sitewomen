@@ -1,5 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
 
 from users.forms import LoginUserForm, RegisterUserForm
 
@@ -13,17 +15,8 @@ class LoginUser(LoginView):
     #     return reverse_lazy('about')
 
 
-def register(request):
-    match request.method:
-        case 'POST':
-            form = RegisterUserForm(request.POST)
-            if form.is_valid():
-                user = form.save(commit=False)  # создание объекта без сохранения в БД
-                user.set_password(form.cleaned_data.get('password'))
-                user.save()
-                return render(request, 'users/register_done.html')
-
-        case _:
-            form = RegisterUserForm()
-
-    return render(request, 'users/register.html', {'form': form, 'title': 'Регистрация'})
+class RegisterUser(CreateView):
+    template_name = 'users/register.html'
+    form_class = RegisterUserForm
+    success_url = reverse_lazy('users:login')
+    extra_context = {'title': 'Регистрация'}
