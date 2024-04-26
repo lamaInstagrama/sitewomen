@@ -151,4 +151,23 @@ AUTHENTICATION_BACKENDS = [
     'users.authentication.EmailAuthBackend'
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Yandex
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.yandex.com'
+# EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+# EMAIL_HOST_USER = 'sitewomen1998@ya.ru'
+# EMAIL_HOST_PASSWORD = 'omduvkwpfnvegfar'
+
+# Google
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.google.com'
+EMAIL_PORT = 587
+EMAIL_USE_TSL = True
+EMAIL_HOST_USER = 'sitewomen1998@gmail.com'
+EMAIL_HOST_PASSWORD = 'cpgv hmyn vobc emlx'
+
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
