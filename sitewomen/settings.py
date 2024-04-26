@@ -137,6 +137,8 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
+DEFAULT_USER_PHOTO = MEDIA_URL + '/users/default.png'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -150,6 +152,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.authentication.EmailAuthBackend'
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 # Yandex
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

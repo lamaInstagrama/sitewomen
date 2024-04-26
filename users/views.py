@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
@@ -26,7 +27,7 @@ class RegisterUser(CreateView):
 
 class ProfileUser(LoginRequiredMixin, UpdateView):
     template_name = 'users/profile.html'
-    extra_context = {'title': 'Профиль'}
+    extra_context = {'title': 'Профиль', 'default_photo': settings.DEFAULT_USER_PHOTO}
     form_class = ProfileUserForm
 
     def get_object(self, queryset=None):
