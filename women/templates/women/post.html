@@ -17,6 +17,10 @@
 {% block content %}
 <h1>{{post.title}}</h1>
 
+{% if user == post.author and perms.women.change_women or user.is_superuser %}
+    <a href="{% url 'edit_page' post.slug %}">Редактировать статью</a>
+{% endif %}
+
 {% if post.photo %}
 <p><img class="img-article-left" src="{{post.photo.url}}"></p>
 {% endif %}

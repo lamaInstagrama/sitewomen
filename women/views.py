@@ -1,5 +1,5 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import render, redirect, get_object_or_404
@@ -36,10 +36,11 @@ def about(request):
                   {'title': 'О сайте', 'page_obj': page_obj})
 
 
-class ShowPost(DataMixin, DetailView):
+class ShowPost(PermissionRequiredMixin, DataMixin, DetailView):
     template_name = 'women/post.html'
     slug_url_kwarg = 'post_slug'
     context_object_name = 'post'
+    permission_required = 'women.view_women'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -49,11 +50,11 @@ class ShowPost(DataMixin, DetailView):
         return get_object_or_404(Women.published, slug=self.kwargs[self.slug_url_kwarg])
 
 
-class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+class AddPage(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title_page = 'Добавление статьи'
-    # login_url = '/admin/'
+    permission_required = 'women.add_women'
 
     def form_valid(self, form):
         post = form.save(commit=False)
@@ -61,12 +62,13 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdatePage(DataMixin, UpdateView):
+class UpdatePage(PermissionRequiredMixin, DataMixin, UpdateView):
     model = Women
     fields = ['title', 'content', 'photo', 'is_published', 'cat']
     template_name = 'women/addpage.html'
     success_url = reverse_lazy('home')
     title_page = 'Редактирование статьи'
+    permission_required = 'women.change_women'
 
 
 class DeletePage(DataMixin, DeleteView):
@@ -76,6 +78,7 @@ class DeletePage(DataMixin, DeleteView):
     title_page = 'Удаление статьи'
 
 
+@permission_required(perm='women.view_women')
 def contact(request):
     return HttpResponse("Обратная связь")
 
