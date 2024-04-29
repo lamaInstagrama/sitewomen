@@ -19,6 +19,9 @@
     </form>
     <p></p>
     <p>Вход с помощью соцсетей</p>
-    <p><a href="{% url 'social:begin' 'github' %}"><img src="/media/OAuth/github.png" width="40px"></a></p>
+    <p><a href="{% url 'social:begin' 'github' %}"><img src="/media/OAuth/github.png" width="40px"></a>
+    <a href="{% url 'social:begin' 'vk-oauth2' %}"><img src="/media/OAuth/vk.png" width="46px"></a></p>
+
+
 
 {% endblock %}

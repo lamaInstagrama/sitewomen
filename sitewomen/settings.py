@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '192.168.0.205',
     '10.87.180.102',
+    'sitewomen.ru'
 ]
 
 INTERNAL_IPS = ["127.0.0.1"]
@@ -150,6 +151,7 @@ LOGOUT_REDIRECT_URL = 'users:login'
 LOGIN_URL = 'users:login'
 
 AUTHENTICATION_BACKENDS = [
+    'social_core.backends.vk.VKOAuth2',
     'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'users.authentication.EmailAuthBackend'
@@ -179,6 +181,10 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 SOCIAL_AUTH_GITHUB_KEY = 'Iv1.e32168e87f409af8'
 SOCIAL_AUTH_GITHUB_SECRET = '230a2cd94803f5a27e9a29f8b3320f971463a630'
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = '51915028'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = '4W9lsX1ETyH8HZSKSCI3'
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',

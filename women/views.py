@@ -36,11 +36,10 @@ def about(request):
                   {'title': 'О сайте', 'page_obj': page_obj})
 
 
-class ShowPost(PermissionRequiredMixin, DataMixin, DetailView):
+class ShowPost(DataMixin, DetailView):
     template_name = 'women/post.html'
     slug_url_kwarg = 'post_slug'
     context_object_name = 'post'
-    permission_required = 'women.view_women'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
