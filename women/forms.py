@@ -1,3 +1,4 @@
+from captcha.fields import CaptchaField
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MaxLengthValidator
@@ -42,3 +43,10 @@ class AddPostForm(forms.ModelForm):
 
 class UploadFileForm(forms.Form):
     file = forms.ImageField(label="Файл")
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-input'}), label='Имя')
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-input'}), label='E-mail')
+    text = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-input'}), label='Текст сообщения')
+    captcha = CaptchaField()
