@@ -29,10 +29,15 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '192.168.0.205',
     '10.87.180.102',
-    'sitewomen.ru'
+    'sitewomen.ru',
 ]
 
-INTERNAL_IPS = ["127.0.0.1"]
+INTERNAL_IPS = [
+    "127.0.0.1",
+    '192.168.0.205',
+    '10.87.180.102',
+    'sitewomen.ru',
+]
 
 
 # Application definition
@@ -53,14 +58,16 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # "django.middleware.cache.UpdateCacheMiddleware",
     'django.middleware.common.CommonMiddleware',
+    # "django.middleware.cache.FetchFromCacheMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'sitewomen.urls'
@@ -210,7 +217,12 @@ SOCIAL_AUTH_PIPELINE = (
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        # "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        # "LOCATION": "redis://127.0.0.1:6379",
     }
 }
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 10
+CACHE_MIDDLEWARE_KEY_PREFIX = 'sitewomen'
